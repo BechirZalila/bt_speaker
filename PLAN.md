@@ -44,11 +44,14 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - [x] Vérifier la valeur (90 %)
 - [x] Rédiger ce plan
 
-### Étape 1 – Prototype console (session 2)
-- [ ] Installer le SDK .NET 8
-- [ ] Créer le projet (`dotnet new console`)
-- [ ] Lister les périphériques BT exposant une batterie et afficher le niveau via cfgmgr32
-- **Critère de fin** : la console affiche « P9 : 90 % »
+### Étape 1 – Prototype console ✅ (session 2)
+- [x] Installer le SDK .NET 8
+- [x] Créer le projet `src/BtBatteryTray` (net8.0-windows)
+- [x] Lister les périphériques BT exposant une batterie et afficher le niveau via cfgmgr32
+- [x] Afficher le nom de l'appareil physique (« P9 ») plutôt que celui du service (« P9 Hands-Free AG »),
+      via le `ContainerId` commun aux nœuds d'un même appareil
+- **Critère de fin** : la console affiche « P9 : 80 % » ✅ (lecture complète ≈ 70 ms)
+- Lancement : `dotnet run --project src/BtBatteryTray -- --verbose`
 
 ### Étape 2 – Icône dans la barre des tâches (session 2 ou 3)
 - [ ] Passer en application WinForms sans fenêtre
@@ -77,3 +80,4 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
+- **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
