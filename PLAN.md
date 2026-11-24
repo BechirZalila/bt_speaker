@@ -29,7 +29,8 @@ Get-PnpDevice -PresentOnly | % { $b = Get-PnpDeviceProperty -InstanceId $_.Insta
 | Connexion | Propriété non documentée `{83DA6326-97A6-4088-9453-A1923F573B29} 15` sur le nœud `BTHENUM\DEV_…` / `BTHLE\DEV_…` (TRUE = connecté) | Les nœuds restent « présents » quand le casque est éteint ; la batterie garde sa dernière valeur. |
 | Affichage | **Une icône par appareil** (casque, souris…). Le chiffre (ex. « 90 ») dessiné dans l'icône, couleur selon le niveau (vert > 50, orange > 20, rouge ≤ 20), info-bulle « P9 : 90 % » | Lisible d'un coup d'œil, tout est visible sans clic. |
 | Appareil déconnecté | Son icône disparaît. Si aucun appareil : une seule icône grise « -- » (pour garder l'accès au menu Quitter) | |
-| Démarrage | Raccourci dans le dossier Démarrage (`shell:startup`) | Simple, sans droits admin. |
+| Démarrage | Valeur `BtBatteryTray` dans `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, activable depuis le menu | Simple, sans droits admin, facile à activer/désactiver. |
+| Préférences | `%APPDATA%\BtBatteryTray\settings.json` (appareils masqués, alerte, seuil) | Lisible et modifiable à la main. |
 
 ## Prérequis à installer (à faire par toi)
 Seul le **SDK .NET 8** manque (le runtime est déjà là) :
@@ -79,15 +80,18 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
   - Dans un filtre AQS, les clés `{GUID} pid` ne sont pas acceptées : seuls les noms canoniques le sont
     (`System.Devices.DeviceInstanceId`, `System.Devices.Present`…).
 
-### Étape 4 – Confort (session 4)
-- [ ] Possibilité de masquer un appareil dans le menu (ex. ne garder que le casque)
-- [ ] Petit fichier de config (`settings.json`) pour mémoriser le choix
-- [ ] Option : notification Windows quand la batterie passe sous 20 %
-- [ ] Option « Lancer au démarrage » dans le menu
+### Étape 4 – Confort (session 2)
+- [x] Sous-menu « Appareils affichés » : cocher/décocher chaque appareil (les déconnectés y figurent aussi)
+- [x] Préférences dans `%APPDATA%\BtBatteryTray\settings.json`
+- [x] Alerte batterie faible (notification Windows) à ≤ 20 %, une seule fois par décharge
+      (réarmée quand le niveau repasse au-dessus de seuil + 5 %) ; seuil modifiable dans `settings.json`
+- [x] Option « Lancer au démarrage de Windows » (clé Run de l'utilisateur)
+- [x] Test de l'alerte avec un seuil temporaire à 85 % : alertes émises pour le casque et la souris
+- [ ] Validation par l'utilisateur (menu, notification, démarrage)
 
 ### Étape 5 – Livraison (session 4)
 - [ ] Publication en exe unique (`dotnet publish -c Release`)
-- [ ] Installation dans `%LOCALAPPDATA%\BtBatteryTray` + raccourci de démarrage
+- [ ] Installation dans `%LOCALAPPDATA%\BtBatteryTray` (le lancement au démarrage pointe alors vers cet exe)
 - [ ] README d'utilisation
 - [ ] Penser à épingler l'icône pour qu'elle reste visible (Paramètres > Personnalisation > Barre des tâches > Autres icônes)
 
@@ -95,4 +99,4 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
 - **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
   Choix validé : une icône par appareil. Étapes 2 et 3 terminées et validées. Licence MIT ajoutée.
-  Prochaine action : étape 4 (confort).
+  Étape 4 codée, en attente de validation. Prochaine action : étape 5 (livraison).
