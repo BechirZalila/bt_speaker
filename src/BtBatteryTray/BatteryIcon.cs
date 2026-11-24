@@ -1,5 +1,4 @@
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
 namespace BtBatteryTray;
@@ -9,35 +8,9 @@ namespace BtBatteryTray;
 /// </summary>
 internal static class BatteryIcon
 {
-    public static Icon Create(int? level)
+    public static Icon Create(int? level, Size? iconSize = null)
     {
-        var size = SystemInformation.SmallIconSize;
-        var text = level is null ? "--" : level.Value.ToString();
-        var color = level switch
-        {
-            null => Color.Gray,
-            > 50 => Color.FromArgb(0x3C, 0xC8, 0x50),
-            > 20 => Color.Orange,
-            _ => Color.FromArgb(0xF0, 0x40, 0x40),
-        };
-
-        using var bitmap = new Bitmap(size.Width, size.Height);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.Clear(Color.Transparent);
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-
-            using var font = FitFont(g, text, size);
-            using var brush = new SolidBrush(color);
-            using var format = new StringFormat
-            {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center,
-                FormatFlags = StringFormatFlags.NoWrap,
-            };
-            g.DrawString(text, font, brush, new RectangleF(0, 0, size.Width, size.Height + 1), format);
-        }
+        using var bitmap = Render(level, iconSize ?? SystemInformation.SmallIconSize);
 
         // Icon.FromHandle ne possède pas le handle : on clone puis on libère le handle natif.
         var hIcon = bitmap.GetHicon();
@@ -52,18 +25,52 @@ internal static class BatteryIcon
         }
     }
 
-    // Plus grande police qui fait tenir le texte (jusqu'à "100") dans l'icône.
-    private static Font FitFont(Graphics g, string text, Size size)
+    public static Bitmap Render(int? level, Size size)
     {
-        for (var px = size.Height; px > 6; px--)
+        var text = level is null ? "--" : level.Value.ToString();
+        var color = level switch
         {
-            var font = new Font("Segoe UI", px, FontStyle.Bold, GraphicsUnit.Pixel);
-            var measured = g.MeasureString(text, font, PointF.Empty, StringFormat.GenericTypographic);
-            if (measured.Width <= size.Width && measured.Height <= size.Height + 2)
-                return font;
-            font.Dispose();
+            null => Color.Gray,
+            > 50 => Color.FromArgb(0x3C, 0xC8, 0x50),
+            > 20 => Color.Orange,
+            _ => Color.FromArgb(0xF0, 0x40, 0x40),
+        };
+
+        var bitmap = new Bitmap(size.Width, size.Height);
+        using var g = Graphics.FromImage(bitmap);
+        g.Clear(Color.Transparent);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+        // Le texte est converti en contour vectoriel puis mis à l'échelle pour remplir l'icône :
+        // aucun risque de troncature, quelle que soit la taille d'icône (16, 20, 24 px…).
+        using var path = new GraphicsPath();
+        using (var family = new FontFamily("Segoe UI"))
+        using (var format = StringFormat.GenericTypographic)
+        {
+            path.AddString(text, family, (int)FontStyle.Bold, 100f, PointF.Empty, format);
         }
-        return new Font("Segoe UI", 6, FontStyle.Bold, GraphicsUnit.Pixel);
+
+        var bounds = path.GetBounds();
+        if (bounds.Width > 0 && bounds.Height > 0)
+        {
+            const float margin = 0.5f;
+            var maxWidth = size.Width - 2 * margin;
+            var maxHeight = size.Height - 2 * margin;
+            // Hauteur visée ≈ 80 % de l'icône ; on réduit si le texte est trop large (ex. "100").
+            var scale = Math.Min(maxWidth / bounds.Width, maxHeight * 0.8f / bounds.Height);
+
+            using var matrix = new Matrix();
+            matrix.Translate(size.Width / 2f, size.Height / 2f);
+            matrix.Scale(scale, scale);
+            matrix.Translate(-(bounds.X + bounds.Width / 2f), -(bounds.Y + bounds.Height / 2f));
+            path.Transform(matrix);
+
+            using var brush = new SolidBrush(color);
+            g.FillPath(brush, path);
+        }
+
+        return bitmap;
     }
 
     [DllImport("user32.dll")]
