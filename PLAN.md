@@ -104,6 +104,12 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
   Étape 4 validée. Étape 5 terminée : version 1.0.0 livrée. Projet terminé.
 
 - Icône de l'exe (pile verte, générée par `tools/make-icon.ps1`) et release GitHub v1.0.0 avec l'exe compilé.
+- Assistant d'installation Inno Setup (`installer/BtBatteryTray.iss`, construit par `tools/build-installer.ps1`) :
+  installation par utilisateur sans droits admin, option de lancement au démarrage, raccourci menu Démarrer,
+  téléchargement du runtime .NET 8 Desktop si absent, fermeture de l'application avant mise à jour,
+  désinstalleur (propose de supprimer les préférences). 5,5 Mo. Testé : installation, réinstallation
+  avec application lancée, désinstallation complète. Non testé : le téléchargement du runtime (déjà présent ici).
+  L'assistant remplace l'exe seul dans la release v1.0.0.
 
 ## Pistes d'évolution (non planifiées)
 - Repère visuel pour distinguer les appareils si plusieurs ont un niveau proche

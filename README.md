@@ -17,17 +17,21 @@ requête aux appareils. Environ 15 Mo de mémoire.
 - Un appareil Bluetooth qui communique son niveau de batterie à Windows
   (s'il apparaît avec un pourcentage dans *Paramètres > Bluetooth et appareils*, c'est bon)
 
-## Installation rapide (sans compiler)
-1. Installer le runtime .NET 8 Desktop s'il n'est pas déjà présent :
-   `winget install --id Microsoft.DotNet.DesktopRuntime.8 -e`
-2. Télécharger `BtBatteryTray.exe` depuis la
+## Installation
+1. Télécharger `BtBatteryTray-Setup-<version>.exe` depuis la
    [dernière release](https://github.com/BechirZalila/bt_speaker/releases/latest).
-3. Le placer dans un dossier durable, par exemple `%LOCALAPPDATA%\BtBatteryTray`, puis le lancer.
-   L'exe n'est pas signé : Windows SmartScreen peut afficher un avertissement
-   (*Informations complémentaires > Exécuter quand même*).
-4. Clic droit sur une icône > **Lancer au démarrage de Windows**.
+2. Le lancer et suivre l'assistant. Aucun droit administrateur n'est nécessaire :
+   l'application s'installe dans `%LOCALAPPDATA%\Programs\BT Battery Tray`.
+   - Option « Lancer au démarrage de Windows » (cochée par défaut)
+   - Si le runtime .NET 8 Desktop est absent, l'assistant le télécharge et l'installe
+     (Windows demande alors une autorisation administrateur pour cette seule étape).
+   - L'assistant n'est pas signé : Windows SmartScreen peut afficher un avertissement
+     (*Informations complémentaires > Exécuter quand même*).
+3. Pour mettre à jour : lancer l'assistant de la nouvelle version (l'application est fermée automatiquement).
 
-## Installation depuis les sources
+Désinstallation : *Paramètres > Applications > Applications installées > BT Battery Tray*.
+
+## Installation depuis les sources (développeurs)
 Nécessite le SDK .NET 8 : `winget install --id Microsoft.DotNet.SDK.8 -e`
 
 Dans PowerShell, depuis le dossier du projet :
@@ -79,6 +83,14 @@ dotnet run --project src/BtBatteryTray            # lancer en mode développemen
 dotnet run --project src/BtBatteryTray -- --list  # mode texte
 ```
 L'icône de l'application (`src/BtBatteryTray/app.ico`) est générée par `tools/make-icon.ps1`.
+
+### Construire l'assistant d'installation
+Nécessite [Inno Setup 6](https://jrsoftware.org/isinfo.php) : `winget install --id JRSoftware.InnoSetup -e`
+```powershell
+.\tools\build-installer.ps1   # → artifacts\BtBatteryTray-Setup-<version>.exe
+```
+La version est lue dans `src/BtBatteryTray/BtBatteryTray.csproj` ; le script de l'assistant est
+`installer/BtBatteryTray.iss`.
 
 La conception et l'historique du projet sont décrits dans [PLAN.md](PLAN.md).
 
