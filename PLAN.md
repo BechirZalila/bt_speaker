@@ -26,8 +26,8 @@ Get-PnpDevice -PresentOnly | % { $b = Get-PnpDeviceProperty -InstanceId $_.Insta
 | Technologie | C# / .NET 8, WinForms (`NotifyIcon`) | Léger (~15-25 Mo RAM), pas de dépendance externe, runtime .NET 8 déjà présent. |
 | Lecture | API Windows `CM_Get_DevNode_Property` (cfgmgr32) | Lecture d'une valeur en cache du système : pas de radio, coût CPU négligeable. |
 | Rafraîchissement | Événementiel (notification de changement de périphérique) + filet de sécurité toutes les 5 min | CPU au repos ≈ 0 %, aucune requête au casque. |
-| Affichage | Le chiffre (ex. « 90 ») dessiné dans l'icône, couleur selon le niveau (vert > 50, orange > 20, rouge ≤ 20), info-bulle « P9 : 90 % » | Lisible d'un coup d'œil. |
-| Casque déconnecté | Icône grisée « -- » | |
+| Affichage | **Une icône par appareil** (casque, souris…). Le chiffre (ex. « 90 ») dessiné dans l'icône, couleur selon le niveau (vert > 50, orange > 20, rouge ≤ 20), info-bulle « P9 : 90 % » | Lisible d'un coup d'œil, tout est visible sans clic. |
+| Appareil déconnecté | Son icône disparaît. Si aucun appareil : une seule icône grise « -- » (pour garder l'accès au menu Quitter) | |
 | Démarrage | Raccourci dans le dossier Démarrage (`shell:startup`) | Simple, sans droits admin. |
 
 ## Prérequis à installer (à faire par toi)
@@ -53,11 +53,15 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - **Critère de fin** : la console affiche « P9 : 80 % » ✅ (lecture complète ≈ 70 ms)
 - Lancement : `dotnet run --project src/BtBatteryTray -- --verbose`
 
-### Étape 2 – Icône dans la barre des tâches (session 2 ou 3)
-- [ ] Passer en application WinForms sans fenêtre
-- [ ] `NotifyIcon` avec le chiffre dessiné dynamiquement + couleur
-- [ ] Info-bulle et menu clic droit (Actualiser, Quitter)
-- **Critère de fin** : l'icône affiche le bon niveau
+### Étape 2 – Icônes dans la barre des tâches (session 2)
+- [x] Passer en application WinForms sans fenêtre (une seule instance à la fois)
+- [x] Une `NotifyIcon` par appareil, chiffre dessiné dynamiquement + couleur
+- [x] Info-bulle et menu clic droit (Actualiser, Quitter)
+- [x] Rafraîchissement provisoire toutes les minutes (remplacé à l'étape 3)
+- [x] Mode texte conservé : `BtBatteryTray.exe --list [--verbose]`
+- [ ] Validation visuelle par l'utilisateur
+- **Critère de fin** : chaque icône affiche le bon niveau
+- Mesure au lancement : ~10 Mo de RAM privée
 
 ### Étape 3 – Rafraîchissement économe (session 3)
 - [ ] Abonnement aux notifications de changement de propriété/périphérique
@@ -67,7 +71,7 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - **Critère de fin** : le niveau se met à jour seul quand il baisse ; pas d'impact mesurable
 
 ### Étape 4 – Confort (session 4)
-- [ ] Choix du périphérique dans le menu (casque, souris…)
+- [ ] Possibilité de masquer un appareil dans le menu (ex. ne garder que le casque)
 - [ ] Petit fichier de config (`settings.json`) pour mémoriser le choix
 - [ ] Option : notification Windows quand la batterie passe sous 20 %
 - [ ] Option « Lancer au démarrage » dans le menu
@@ -81,3 +85,4 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
 - **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
+  Choix validé : une icône par appareil. Étape 2 codée, en attente de validation visuelle.
