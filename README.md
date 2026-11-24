@@ -1,11 +1,73 @@
 # BT Battery Tray
 
 Petit utilitaire Windows qui affiche en permanence, dans la zone de notification de la barre des tâches,
-le niveau de batterie d'un casque Bluetooth (ou de tout périphérique Bluetooth qui le communique à Windows).
+le niveau de batterie de tes appareils Bluetooth (casque, souris…) : une icône par appareil connecté,
+avec le pourcentage en couleur.
 
-Objectif : simple, léger, sans impact sur la batterie du PC ni du périphérique.
+- 🟢 au-dessus de 50 %, 🟠 de 21 à 50 %, 🔴 à 20 % et moins
+- Au survol : nom de l'appareil et niveau (« P9 : 80 % »)
+- L'icône disparaît quand l'appareil est éteint et revient à sa reconnexion
 
-Projet en cours de développement : voir [PLAN.md](PLAN.md).
+**Aucun impact sur la batterie** : l'application lit la valeur que Windows connaît déjà (celle des
+Paramètres Bluetooth) et ne se réveille que lorsque Windows signale un changement. Elle n'envoie aucune
+requête aux appareils. Environ 15 Mo de mémoire.
+
+## Prérequis
+- Windows 10 (2004) ou Windows 11
+- SDK .NET 8 pour compiler : `winget install --id Microsoft.DotNet.SDK.8 -e`
+- Un appareil Bluetooth qui communique son niveau de batterie à Windows
+  (s'il apparaît avec un pourcentage dans *Paramètres > Bluetooth et appareils*, c'est bon)
+
+## Installation
+Dans PowerShell, depuis le dossier du projet :
+```powershell
+.\install.ps1
+```
+L'application est compilée, installée dans `%LOCALAPPDATA%\BtBatteryTray`, configurée pour se lancer
+au démarrage de Windows, puis démarrée. Aucun droit administrateur n'est nécessaire.
+
+- Sans lancement automatique : `.\install.ps1 -NoStartup`
+- Pour mettre à jour après une modification du code : relancer `.\install.ps1`
+- Si PowerShell refuse d'exécuter le script :
+  `powershell -ExecutionPolicy Bypass -File .\install.ps1`
+
+**Icônes invisibles ?** Windows 11 range les nouvelles icônes derrière la flèche **^** près de l'horloge.
+Fais-les glisser dans la barre des tâches, ou active-les dans
+*Paramètres > Personnalisation > Barre des tâches > Autres icônes de la barre d'état système*.
+
+## Utilisation
+Clic droit sur une icône :
+
+| Menu | Effet |
+|---|---|
+| Appareils affichés | Cocher/décocher les appareils à afficher |
+| Alerte batterie faible | Notification Windows quand un appareil passe sous le seuil (20 % par défaut), une fois par décharge |
+| Lancer au démarrage de Windows | Active/désactive le lancement automatique |
+| Actualiser | Relit immédiatement les niveaux |
+| Quitter | Ferme l'application |
+
+Les préférences sont enregistrées dans `%APPDATA%\BtBatteryTray\settings.json`. Le seuil d'alerte
+peut y être modifié (`"LowBatteryThreshold": 20`), puis relancer l'application.
+
+### Ligne de commande
+| Commande | Effet |
+|---|---|
+| `BtBatteryTray.exe --list` | Affiche les niveaux dans le terminal |
+| `BtBatteryTray.exe --list --verbose` | Idem, avec l'identifiant Windows de chaque appareil |
+| `BtBatteryTray.exe --log` | Lance l'application avec un journal de diagnostic dans `%TEMP%\BtBatteryTray.log` |
+
+## Désinstallation
+```powershell
+.\uninstall.ps1                 # conserve les préférences
+.\uninstall.ps1 -RemoveSettings # supprime aussi les préférences
+```
+
+## Développement
+```powershell
+dotnet run --project src/BtBatteryTray            # lancer en mode développement
+dotnet run --project src/BtBatteryTray -- --list  # mode texte
+```
+La conception et l'historique du projet sont décrits dans [PLAN.md](PLAN.md).
 
 ## Licence
 [MIT](LICENSE)

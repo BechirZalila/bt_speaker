@@ -87,16 +87,23 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
       (réarmée quand le niveau repasse au-dessus de seuil + 5 %) ; seuil modifiable dans `settings.json`
 - [x] Option « Lancer au démarrage de Windows » (clé Run de l'utilisateur)
 - [x] Test de l'alerte avec un seuil temporaire à 85 % : alertes émises pour le casque et la souris
-- [ ] Validation par l'utilisateur (menu, notification, démarrage)
+- [x] Validation par l'utilisateur (menu, notification, démarrage) ✅
 
-### Étape 5 – Livraison (session 4)
-- [ ] Publication en exe unique (`dotnet publish -c Release`)
-- [ ] Installation dans `%LOCALAPPDATA%\BtBatteryTray` (le lancement au démarrage pointe alors vers cet exe)
-- [ ] README d'utilisation
-- [ ] Penser à épingler l'icône pour qu'elle reste visible (Paramètres > Personnalisation > Barre des tâches > Autres icônes)
+### Étape 5 – Livraison ✅ (session 2)
+- [x] Publication en exe unique (`dotnet publish -c Release`, réglages dans le `.csproj`) : ~24 Mo, ~14 Mo de RAM
+- [x] `install.ps1` : compile, installe dans `%LOCALAPPDATA%\BtBatteryTray`, active le lancement au démarrage
+      (sauf `-NoStartup`) et lance l'application ; relancer le script = mise à jour
+- [x] `uninstall.ps1` (`-RemoveSettings` pour supprimer aussi les préférences)
+- [x] README d'utilisation (installation, icônes à épingler, menu, ligne de commande)
+- [x] Version 1.0.0
 
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
 - **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
   Choix validé : une icône par appareil. Étapes 2 et 3 terminées et validées. Licence MIT ajoutée.
-  Étape 4 codée, en attente de validation. Prochaine action : étape 5 (livraison).
+  Étape 4 validée. Étape 5 terminée : version 1.0.0 livrée. Projet terminé.
+
+## Pistes d'évolution (non planifiées)
+- Icône propre pour l'exe (actuellement icône .NET par défaut)
+- Publication d'une release GitHub avec l'exe compilé
+- Repère visuel pour distinguer les appareils si plusieurs ont un niveau proche

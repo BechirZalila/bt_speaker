@@ -7,6 +7,21 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <Version>1.0.0</Version>
+    <Product>BT Battery Tray</Product>
+    <Description>Niveau de batterie des appareils Bluetooth dans la barre des tâches</Description>
+    <Authors>Bechir Zalila</Authors>
+    <Copyright>Copyright (c) 2026 Bechir Zalila</Copyright>
+  </PropertyGroup>
+
+  <!-- Publication : un seul exe, utilisant le runtime .NET 8 déjà installé sur le PC. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
 </Project>
