@@ -10,6 +10,9 @@ internal static class Program
         if (args.Contains("--list"))
             return ListToConsole(args.Contains("--verbose"));
 
+        if (args.Contains("--log"))
+            Log.Enable();
+
         using var mutex = new Mutex(true, @"Local\BtBatteryTray", out var isFirstInstance);
         if (!isFirstInstance)
             return 0;
@@ -36,7 +39,7 @@ internal static class Program
 
         foreach (var device in devices)
         {
-            output.WriteLine($"{device.Name} : {device.Level} %");
+            output.WriteLine($"{device.Name} : {device.Level} %{(device.IsConnected ? "" : " (déconnecté)")}");
             if (verbose)
                 output.WriteLine($"    {device.InstanceId}");
         }

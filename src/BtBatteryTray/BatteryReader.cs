@@ -3,7 +3,7 @@ using static BtBatteryTray.CfgMgr32;
 
 namespace BtBatteryTray;
 
-internal sealed record BatteryDevice(string Name, string InstanceId, int Level);
+internal sealed record BatteryDevice(string Name, string InstanceId, int Level, bool IsConnected);
 
 /// <summary>
 /// Lit le niveau de batterie que Windows a déjà en cache pour les périphériques Bluetooth.
@@ -14,7 +14,7 @@ internal static class BatteryReader
     public static List<BatteryDevice> ReadAll()
     {
         var withBattery = new List<(uint DevInst, string InstanceId, int Level)>();
-        var deviceNames = new Dictionary<Guid, string>();
+        var physicalDevices = new Dictionary<Guid, (string? Name, bool? Connected)>();
 
         foreach (var instanceId in GetPresentDeviceIds())
         {
@@ -23,12 +23,11 @@ internal static class BatteryReader
             if (CM_Locate_DevNode(out var devInst, instanceId, CM_LOCATE_DEVNODE_NORMAL) != CR_SUCCESS)
                 continue;
 
-            // Nœud représentant l'appareil physique (ex. "P9") : on retient son nom par conteneur.
+            // Nœud représentant l'appareil physique (ex. "P9") : on retient son nom et son état de connexion.
             if (IsPhysicalDeviceNode(instanceId) &&
-                GetGuidProperty(devInst, DEVPKEY_Device_ContainerId) is { } containerId &&
-                GetName(devInst) is { } name)
+                GetGuidProperty(devInst, DEVPKEY_Device_ContainerId) is { } containerId)
             {
-                deviceNames[containerId] = name;
+                physicalDevices[containerId] = (GetName(devInst), GetBoolProperty(devInst, DEVPKEY_Bluetooth_Connected));
             }
 
             if (GetByteProperty(devInst, DEVPKEY_Bluetooth_Battery) is { } level)
@@ -36,15 +35,17 @@ internal static class BatteryReader
         }
 
         // La batterie est souvent portée par un service (ex. "P9 Hands-Free AG") :
-        // on affiche alors le nom de l'appareil physique du même conteneur.
+        // on utilise alors le nom et l'état de connexion de l'appareil physique du même conteneur.
         return withBattery
             .Select(d =>
             {
-                var name = GetGuidProperty(d.DevInst, DEVPKEY_Device_ContainerId) is { } c &&
-                           deviceNames.TryGetValue(c, out var n)
-                    ? n
-                    : GetName(d.DevInst) ?? "Périphérique inconnu";
-                return new BatteryDevice(name, d.InstanceId, d.Level);
+                var physical = GetGuidProperty(d.DevInst, DEVPKEY_Device_ContainerId) is { } c &&
+                               physicalDevices.TryGetValue(c, out var p)
+                    ? p
+                    : default;
+                var name = physical.Name ?? GetName(d.DevInst) ?? "Périphérique inconnu";
+                // Propriété absente : on suppose l'appareil connecté plutôt que de le masquer à tort.
+                return new BatteryDevice(name, d.InstanceId, d.Level, physical.Connected ?? true);
             })
             .ToList();
     }
@@ -85,6 +86,10 @@ internal static class BatteryReader
 
     private static int? GetByteProperty(uint devInst, DevPropKey key) =>
         GetRawProperty(devInst, key, DEVPROP_TYPE_BYTE) is [var b, ..] ? b : null;
+
+    // DEVPROP_BOOLEAN : 0x00 = FALSE, 0xFF = TRUE.
+    private static bool? GetBoolProperty(uint devInst, DevPropKey key) =>
+        GetRawProperty(devInst, key, DEVPROP_TYPE_BOOLEAN) is [var b, ..] ? b != 0 : null;
 
     private static Guid? GetGuidProperty(uint devInst, DevPropKey key) =>
         GetRawProperty(devInst, key, DEVPROP_TYPE_GUID) is { Length: 16 } raw ? new Guid(raw) : null;

@@ -24,10 +24,13 @@ internal static class CfgMgr32
 
     public const uint DEVPROP_TYPE_BYTE = 0x03;
     public const uint DEVPROP_TYPE_GUID = 0x0D;
+    public const uint DEVPROP_TYPE_BOOLEAN = 0x11;
     public const uint DEVPROP_TYPE_STRING = 0x12;
 
     // Niveau de batterie Bluetooth (en %), renseigné par Windows à partir des infos envoyées par le périphérique.
     public static readonly DevPropKey DEVPKEY_Bluetooth_Battery = new("104EA319-6EE2-4701-BD47-8DDBF425BBE5", 2);
+    // Clé non documentée : vaut TRUE sur le nœud de l'appareil physique quand il est connecté.
+    public static readonly DevPropKey DEVPKEY_Bluetooth_Connected = new("83DA6326-97A6-4088-9453-A1923F573B29", 15);
     public static readonly DevPropKey DEVPKEY_Device_FriendlyName = new("A45C254E-DF1C-4EFD-8020-67D146A850E0", 14);
     public static readonly DevPropKey DEVPKEY_Device_DeviceDesc = new("A45C254E-DF1C-4EFD-8020-67D146A850E0", 2);
     public static readonly DevPropKey DEVPKEY_Device_ContainerId = new("8C7ED206-3F8A-4827-B3AB-AE9E1FAEFC6C", 2);

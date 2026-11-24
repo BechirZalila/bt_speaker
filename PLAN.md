@@ -25,7 +25,8 @@ Get-PnpDevice -PresentOnly | % { $b = Get-PnpDeviceProperty -InstanceId $_.Insta
 | Emplacement | Icône dans la zone de notification (system tray) | Le panneau « Paramètres rapides » de Windows 11 n'accepte pas d'extensions tierces. Le tray est visible en permanence. |
 | Technologie | C# / .NET 8, WinForms (`NotifyIcon`) | Léger (~15-25 Mo RAM), pas de dépendance externe, runtime .NET 8 déjà présent. |
 | Lecture | API Windows `CM_Get_DevNode_Property` (cfgmgr32) | Lecture d'une valeur en cache du système : pas de radio, coût CPU négligeable. |
-| Rafraîchissement | Événementiel (notification de changement de périphérique) + filet de sécurité toutes les 5 min | CPU au repos ≈ 0 %, aucune requête au casque. |
+| Rafraîchissement | Événementiel via `DeviceWatcher` WinRT (batterie + connexion des nœuds Bluetooth) + filet de sécurité toutes les 5 min | CPU au repos ≈ 0 %, aucune requête au casque. |
+| Connexion | Propriété non documentée `{83DA6326-97A6-4088-9453-A1923F573B29} 15` sur le nœud `BTHENUM\DEV_…` / `BTHLE\DEV_…` (TRUE = connecté) | Les nœuds restent « présents » quand le casque est éteint ; la batterie garde sa dernière valeur. |
 | Affichage | **Une icône par appareil** (casque, souris…). Le chiffre (ex. « 90 ») dessiné dans l'icône, couleur selon le niveau (vert > 50, orange > 20, rouge ≤ 20), info-bulle « P9 : 90 % » | Lisible d'un coup d'œil, tout est visible sans clic. |
 | Appareil déconnecté | Son icône disparaît. Si aucun appareil : une seule icône grise « -- » (pour garder l'accès au menu Quitter) | |
 | Démarrage | Raccourci dans le dossier Démarrage (`shell:startup`) | Simple, sans droits admin. |
@@ -59,16 +60,24 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - [x] Info-bulle et menu clic droit (Actualiser, Quitter)
 - [x] Rafraîchissement provisoire toutes les minutes (remplacé à l'étape 3)
 - [x] Mode texte conservé : `BtBatteryTray.exe --list [--verbose]`
-- [ ] Validation visuelle par l'utilisateur
-- **Critère de fin** : chaque icône affiche le bon niveau
+- [x] Validation visuelle par l'utilisateur (après correction de la troncature : texte vectoriel mis à l'échelle)
+- **Critère de fin** : chaque icône affiche le bon niveau ✅
 - Mesure au lancement : ~10 Mo de RAM privée
 
-### Étape 3 – Rafraîchissement économe (session 3)
-- [ ] Abonnement aux notifications de changement de propriété/périphérique
-- [ ] Timer de secours 5 min
-- [ ] Gestion connexion/déconnexion du casque (icône grisée)
-- [ ] Mesurer : CPU ≈ 0 %, RAM < 30 Mo (Gestionnaire des tâches)
-- **Critère de fin** : le niveau se met à jour seul quand il baisse ; pas d'impact mesurable
+### Étape 3 – Rafraîchissement économe ✅ (session 2)
+- [x] Abonnement aux notifications Windows (`DeviceWatcher` WinRT, filtre AQS sur les nœuds `BTHENUM\` / `BTHLE\` présents)
+- [x] Regroupement des notifications (1 s) pour une seule lecture par rafale
+- [x] Timer de secours 5 min + redémarrage automatique de la surveillance si Windows l'interrompt
+- [x] Gestion connexion/déconnexion : l'icône d'un appareil déconnecté disparaît
+- [x] Journal de diagnostic optionnel : `BtBatteryTray.exe --log` → `%TEMP%\BtBatteryTray.log`
+- [x] Mesures : ~15 Mo de RAM privée, ~0,3 s CPU cumulé en 4 min (démarrage inclus), aucune activité hors notifications
+- **Critère de fin** : ✅ testé en éteignant/rallumant le casque : icône retirée/rétablie en ~1 s
+- Notes techniques :
+  - L'API native `DevCreateObjectQuery` (cfgmgr32) renvoie `0x8007007E` sur ce PC (build 26300),
+    alors que `DevGetObjects` et la surcouche WinRT fonctionnent : d'où le choix de WinRT.
+  - Coût : `Microsoft.Windows.SDK.NET.dll` (~24 Mo sur disque, chargé en partie seulement en mémoire).
+  - Dans un filtre AQS, les clés `{GUID} pid` ne sont pas acceptées : seuls les noms canoniques le sont
+    (`System.Devices.DeviceInstanceId`, `System.Devices.Present`…).
 
 ### Étape 4 – Confort (session 4)
 - [ ] Possibilité de masquer un appareil dans le menu (ex. ne garder que le casque)
@@ -85,4 +94,5 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
 - **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
-  Choix validé : une icône par appareil. Étape 2 codée, en attente de validation visuelle.
+  Choix validé : une icône par appareil. Étapes 2 et 3 terminées et validées. Licence MIT ajoutée.
+  Prochaine action : étape 4 (confort).
