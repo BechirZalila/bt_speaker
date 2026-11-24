@@ -7,9 +7,11 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>app.ico</ApplicationIcon>
 
     <Version>1.0.0</Version>
     <Product>BT Battery Tray</Product>
+    <AssemblyTitle>BT Battery Tray</AssemblyTitle>
     <Description>Niveau de batterie des appareils Bluetooth dans la barre des tâches</Description>
     <Authors>Bechir Zalila</Authors>
     <Copyright>Copyright (c) 2026 Bechir Zalila</Copyright>

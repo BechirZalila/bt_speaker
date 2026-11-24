@@ -13,12 +13,23 @@ Paramètres Bluetooth) et ne se réveille que lorsque Windows signale un changem
 requête aux appareils. Environ 15 Mo de mémoire.
 
 ## Prérequis
-- Windows 10 (2004) ou Windows 11
-- SDK .NET 8 pour compiler : `winget install --id Microsoft.DotNet.SDK.8 -e`
+- Windows 10 (2004) ou Windows 11, 64 bits
 - Un appareil Bluetooth qui communique son niveau de batterie à Windows
   (s'il apparaît avec un pourcentage dans *Paramètres > Bluetooth et appareils*, c'est bon)
 
-## Installation
+## Installation rapide (sans compiler)
+1. Installer le runtime .NET 8 Desktop s'il n'est pas déjà présent :
+   `winget install --id Microsoft.DotNet.DesktopRuntime.8 -e`
+2. Télécharger `BtBatteryTray.exe` depuis la
+   [dernière release](https://github.com/BechirZalila/bt_speaker/releases/latest).
+3. Le placer dans un dossier durable, par exemple `%LOCALAPPDATA%\BtBatteryTray`, puis le lancer.
+   L'exe n'est pas signé : Windows SmartScreen peut afficher un avertissement
+   (*Informations complémentaires > Exécuter quand même*).
+4. Clic droit sur une icône > **Lancer au démarrage de Windows**.
+
+## Installation depuis les sources
+Nécessite le SDK .NET 8 : `winget install --id Microsoft.DotNet.SDK.8 -e`
+
 Dans PowerShell, depuis le dossier du projet :
 ```powershell
 .\install.ps1
@@ -67,6 +78,8 @@ peut y être modifié (`"LowBatteryThreshold": 20`), puis relancer l'application
 dotnet run --project src/BtBatteryTray            # lancer en mode développement
 dotnet run --project src/BtBatteryTray -- --list  # mode texte
 ```
+L'icône de l'application (`src/BtBatteryTray/app.ico`) est générée par `tools/make-icon.ps1`.
+
 La conception et l'historique du projet sont décrits dans [PLAN.md](PLAN.md).
 
 ## Licence

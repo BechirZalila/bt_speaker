@@ -103,7 +103,8 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
   Choix validé : une icône par appareil. Étapes 2 et 3 terminées et validées. Licence MIT ajoutée.
   Étape 4 validée. Étape 5 terminée : version 1.0.0 livrée. Projet terminé.
 
+- Icône de l'exe (pile verte, générée par `tools/make-icon.ps1`) et release GitHub v1.0.0 avec l'exe compilé.
+
 ## Pistes d'évolution (non planifiées)
-- Icône propre pour l'exe (actuellement icône .NET par défaut)
-- Publication d'une release GitHub avec l'exe compilé
 - Repère visuel pour distinguer les appareils si plusieurs ont un niveau proche
+- Signature de l'exe (éviter l'avertissement SmartScreen)
