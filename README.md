@@ -6,3 +6,6 @@ le niveau de batterie d'un casque Bluetooth (ou de tout périphérique Bluetooth
 Objectif : simple, léger, sans impact sur la batterie du PC ni du périphérique.
 
 Projet en cours de développement : voir [PLAN.md](PLAN.md).
+
+## Licence
+[MIT](LICENSE)
