@@ -37,6 +37,7 @@ internal sealed class TrayApp : ApplicationContext
     private readonly DeviceWatcher _watcher;
     private List<BatteryDevice> _devices = [];
     private NotifyIcon? _placeholder;
+    private AboutForm? _aboutForm;
     private AvailableUpdate? _update;
     private Version? _notifiedVersion;
     private bool _updateBusy;
@@ -77,6 +78,7 @@ internal sealed class TrayApp : ApplicationContext
         _menu.Items.Add(_updatesMenu);
         _menu.Items.Add(new ToolStripSeparator());
         _menu.Items.Add("Actualiser", null, (_, _) => Refresh("menu"));
+        _menu.Items.Add("À propos…", null, (_, _) => ShowAbout());
         _menu.Items.Add("Quitter", null, (_, _) => ExitThread());
 
         _safetyTimer.Interval = (int)SafetyRefreshInterval.TotalMilliseconds;
@@ -392,6 +394,24 @@ internal sealed class TrayApp : ApplicationContext
         }
     }
 
+    // Une seule fenêtre « À propos » à la fois : un second clic la ramène au premier plan.
+    private void ShowAbout()
+    {
+        if (_aboutForm is { IsDisposed: false })
+        {
+            _aboutForm.Activate();
+            return;
+        }
+        _aboutForm = new AboutForm();
+        _aboutForm.FormClosed += (_, _) =>
+        {
+            _aboutForm?.Dispose();
+            _aboutForm = null;
+        };
+        _aboutForm.Show();
+        _aboutForm.Activate();
+    }
+
     private NotifyIcon CreateNotifyIcon()
     {
         var icon = new NotifyIcon { ContextMenuStrip = _menu };
@@ -435,6 +455,7 @@ internal sealed class TrayApp : ApplicationContext
                 Remove(icon);
             if (_placeholder is not null)
                 Remove(_placeholder);
+            _aboutForm?.Dispose();
             _menu.Dispose();
         }
         base.Dispose(disposing);

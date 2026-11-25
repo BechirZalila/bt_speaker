@@ -66,6 +66,7 @@ Clic droit sur une icône :
 | Lancer au démarrage de Windows | Active/désactive le lancement automatique |
 | Mises à jour | *Rechercher maintenant*, *Rechercher automatiquement* (une fois par jour, activé par défaut), version installée |
 | Actualiser | Relit immédiatement les niveaux |
+| À propos… | Version, auteur, licence et liens du projet |
 | Quitter | Ferme l'application |
 
 Les préférences sont enregistrées dans `%APPDATA%\BtBatteryTray\settings.json`. Le seuil d'alerte
@@ -77,6 +78,7 @@ peut y être modifié (`"LowBatteryThreshold": 20`), puis relancer l'application
 | `BtBatteryTray.exe --list` | Affiche les niveaux dans le terminal |
 | `BtBatteryTray.exe --list --verbose` | Idem, avec l'identifiant Windows de chaque appareil |
 | `BtBatteryTray.exe --log` | Lance l'application avec un journal de diagnostic dans `%TEMP%\BtBatteryTray.log` |
+| `BtBatteryTray.exe --about` | Affiche seulement la fenêtre « À propos » |
 | `BtBatteryTray.exe --check-update [--download]` | Indique si une nouvelle version existe ; `--download` télécharge et vérifie l'assistant sans l'installer |
 
 La mise à jour intégrée télécharge l'assistant dans `%TEMP%\BtBatteryTray-Update`, vérifie son empreinte

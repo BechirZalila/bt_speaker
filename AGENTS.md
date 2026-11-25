@@ -12,6 +12,7 @@ Windows-only tray app (C# / .NET 8 WinForms) showing Bluetooth device battery le
 - Build: `dotnet build src/BtBatteryTray`. Output goes to `bin/Debug/net8.0-windows10.0.19041.0/` (TFM includes the Windows SDK version).
 - Quick check without UI: `BtBatteryTray.exe --list [--verbose]` (prints levels to the parent console through `AttachConsole`).
 - Diagnose events: `BtBatteryTray.exe --log` → `%TEMP%\BtBatteryTray.log`.
+- Show the About window alone: `BtBatteryTray.exe --about`. To screenshot a window from PowerShell, call `SetProcessDPIAware()` first: otherwise `GetWindowRect` returns scaled-down coordinates and the capture looks clipped.
 - Stop the running instance before rebuilding (`Get-Process BtBatteryTray | Stop-Process`): the exe is locked, and a single-instance mutex `Local\BtBatteryTray` makes a second launch exit silently.
 - Installer: `.\tools\build-installer.ps1` → `artifacts\BtBatteryTray-Setup-<version>.exe` (needs Inno Setup 6; version is read from `<Version>` in the csproj).
 - Release publish settings (single-file, framework-dependent, win-x64) live in the csproj under `Configuration == Release`.

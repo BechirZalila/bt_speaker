@@ -110,7 +110,13 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - [x] Diagnostic : `BtBatteryTray.exe --check-update [--download]`
 - [x] Testé : détection (0.9.0 → 1.0.0 proposée, 1.1.0 à jour), téléchargement et vérification SHA-256 de
       l'assistant 1.0.0, compilation de l'assistant 1.1.0
-- [ ] Validation par l'utilisateur de la mise à jour de bout en bout (nécessite une release postérieure à 1.1.0)
+- [ ] Validation par l'utilisateur de la mise à jour de bout en bout (1.1.0 installée → release 1.2.0)
+
+### Étape 7 – Fenêtre « À propos » (session 3, version 1.2.0)
+- [x] `AboutForm.cs` : nom, version, description, auteur, copyright (attributs de l'assembly, issus du `.csproj`),
+      liens vers la licence MIT, le code source et les issues GitHub ; une seule fenêtre à la fois
+- [x] Entrée « À propos… » dans le menu, option `--about` pour l'afficher seule
+- [x] Release GitHub v1.2.0 (inclut la mise à jour intégrée de la 1.1.0, jamais publiée seule)
 
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
@@ -126,6 +132,7 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
   avec application lancée, désinstallation complète. Non testé : le téléchargement du runtime (déjà présent ici).
   L'assistant remplace l'exe seul dans la release v1.0.0.
 - **Session 3 (25/11/2026)** : `CLAUDE.md` ajouté. Étape 6 : mise à jour intégrée depuis les releases GitHub (version 1.1.0).
+  Étape 7 : fenêtre « À propos », version 1.2.0 publiée.
 
 ## Pistes d'évolution (non planifiées)
 - Repère visuel pour distinguer les appareils si plusieurs ont un niveau proche

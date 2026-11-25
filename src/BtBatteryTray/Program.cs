@@ -13,6 +13,14 @@ internal static class Program
         if (args.Contains("--check-update"))
             return CheckUpdateToConsole(args.Contains("--download"));
 
+        // Affiche seulement la fenêtre « À propos » (utile pour la vérifier sans passer par le menu).
+        if (args.Contains("--about"))
+        {
+            ApplicationConfiguration.Initialize();
+            Application.Run(new AboutForm());
+            return 0;
+        }
+
         if (args.Contains("--log"))
             Log.Enable();
 
