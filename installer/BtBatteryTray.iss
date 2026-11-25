@@ -58,10 +58,12 @@ Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
 
 [Registry]
 ; Même valeur que celle écrite par l'option « Lancer au démarrage » du menu de l'application.
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BtBatteryTray"; ValueData: """{app}\{#AppExe}"""; Tasks: startup
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BtBatteryTray"; ValueData: """{app}\{#AppExe}"""; Tasks: startup; Check: not IsAppUpdate
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "Lancer {#AppName} maintenant"; Flags: nowait postinstall skipifsilent
+; Mise à jour lancée depuis l'application (/SILENT /UPDATE=1) : on la relance une fois l'exe remplacé.
+Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsAppUpdate
 
 [Code]
 const
@@ -72,6 +74,13 @@ const
 
 var
   DownloadPage: TDownloadWizardPage;
+
+// Vrai quand l'assistant est lancé par la mise à jour intégrée de l'application (paramètre /UPDATE=1) :
+// le lancement au démarrage est alors laissé tel quel (il a pu être changé depuis le menu de l'application).
+function IsAppUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:UPDATE|0}') = '1';
+end;
 
 function IsDesktopRuntime8Installed: Boolean;
 var
@@ -168,7 +177,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   // Réinstallation sans l'option : on retire un éventuel lancement au démarrage existant.
-  if (CurStep = ssPostInstall) and not WizardIsTaskSelected('startup') then
+  if (CurStep = ssPostInstall) and not IsAppUpdate and not WizardIsTaskSelected('startup') then
     RegDeleteValue(HKEY_CURRENT_USER, RunKey, RunValue);
 end;
 

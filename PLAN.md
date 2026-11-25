@@ -97,6 +97,21 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - [x] README d'utilisation (installation, icônes à épingler, menu, ligne de commande)
 - [x] Version 1.0.0
 
+### Étape 6 – Mise à jour intégrée (session 3, version 1.1.0)
+- [x] `UpdateChecker.cs` : lit `releases/latest` de l'API GitHub, compare le tag (`vX.Y.Z`) à la version de l'assembly,
+      cherche l'asset `BtBatteryTray-Setup-*.exe`
+- [x] Recherche 30 s après le démarrage puis toutes les 24 h, désactivable (`"CheckForUpdates"` dans `settings.json`)
+- [x] Bulle « Mise à jour disponible » (une fois par version et par session, clic = installer) et entrée de menu en gras
+- [x] Installation : confirmation avec les notes de version, téléchargement dans `%TEMP%\BtBatteryTray-Update`,
+      vérification de la taille et de l'empreinte SHA-256 (`digest` de l'API), assistant lancé avec
+      `/SILENT /SUPPRESSMSGBOXES /NORESTART /UPDATE=1`, puis l'application quitte
+- [x] Assistant : avec `/UPDATE=1`, laisse le lancement au démarrage tel quel et relance l'application à la fin
+- [x] Copie hors assistant (`install.ps1`, `dotnet run`) : ouvre seulement la page de la release
+- [x] Diagnostic : `BtBatteryTray.exe --check-update [--download]`
+- [x] Testé : détection (0.9.0 → 1.0.0 proposée, 1.1.0 à jour), téléchargement et vérification SHA-256 de
+      l'assistant 1.0.0, compilation de l'assistant 1.1.0
+- [ ] Validation par l'utilisateur de la mise à jour de bout en bout (nécessite une release postérieure à 1.1.0)
+
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
 - **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
@@ -110,6 +125,7 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
   désinstalleur (propose de supprimer les préférences). 5,5 Mo. Testé : installation, réinstallation
   avec application lancée, désinstallation complète. Non testé : le téléchargement du runtime (déjà présent ici).
   L'assistant remplace l'exe seul dans la release v1.0.0.
+- **Session 3 (25/11/2026)** : `CLAUDE.md` ajouté. Étape 6 : mise à jour intégrée depuis les releases GitHub (version 1.1.0).
 
 ## Pistes d'évolution (non planifiées)
 - Repère visuel pour distinguer les appareils si plusieurs ont un niveau proche

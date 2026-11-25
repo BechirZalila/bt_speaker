@@ -19,6 +19,9 @@ internal sealed class Settings
 
     public int LowBatteryThreshold { get; set; } = 20;
 
+    /// <summary>Recherche quotidienne d'une nouvelle version sur GitHub.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
     public static Settings Load()
     {
         try

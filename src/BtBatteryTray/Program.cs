@@ -10,6 +10,9 @@ internal static class Program
         if (args.Contains("--list"))
             return ListToConsole(args.Contains("--verbose"));
 
+        if (args.Contains("--check-update"))
+            return CheckUpdateToConsole(args.Contains("--download"));
+
         if (args.Contains("--log"))
             Log.Enable();
 
@@ -44,6 +47,35 @@ internal static class Program
                 output.WriteLine($"    {device.InstanceId}");
         }
         return 0;
+    }
+
+    // Diagnostic de la recherche de mise à jour ; --download télécharge et vérifie l'assistant sans l'installer.
+    private static int CheckUpdateToConsole(bool download)
+    {
+        AttachConsole(ATTACH_PARENT_PROCESS);
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        using var output = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+        try
+        {
+            output.WriteLine($"Version installée : {UpdateChecker.CurrentVersion}" +
+                             (UpdateChecker.IsInstalledBySetup ? " (assistant d'installation)" : " (hors assistant)"));
+            var update = UpdateChecker.CheckAsync().GetAwaiter().GetResult();
+            if (update is null)
+            {
+                output.WriteLine("À jour.");
+                return 0;
+            }
+            output.WriteLine($"Version {update.Version} disponible : {update.InstallerName} ({update.Size} octets)");
+            output.WriteLine($"    SHA-256 : {update.Sha256 ?? "(non fourni)"}");
+            if (download)
+                output.WriteLine($"Téléchargé et vérifié : {UpdateChecker.DownloadAsync(update, null).GetAwaiter().GetResult()}");
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            output.WriteLine($"Échec : {ex.Message}");
+            return 1;
+        }
     }
 
     private const int ATTACH_PARENT_PROCESS = -1;

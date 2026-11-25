@@ -12,6 +12,10 @@ avec le pourcentage en couleur.
 Paramètres Bluetooth) et ne se réveille que lorsque Windows signale un changement. Elle n'envoie aucune
 requête aux appareils. Environ 15 Mo de mémoire.
 
+**Mises à jour** : une fois par jour, l'application demande à GitHub si une nouvelle version est publiée
+(une seule requête, sans aucune donnée personnelle). Si c'est le cas, une notification le signale et
+l'installation se fait en un clic. Cette recherche peut être désactivée dans le menu.
+
 ## Prérequis
 - Windows 10 (2004) ou Windows 11, 64 bits
 - Un appareil Bluetooth qui communique son niveau de batterie à Windows
@@ -27,7 +31,8 @@ requête aux appareils. Environ 15 Mo de mémoire.
      (Windows demande alors une autorisation administrateur pour cette seule étape).
    - L'assistant n'est pas signé : Windows SmartScreen peut afficher un avertissement
      (*Informations complémentaires > Exécuter quand même*).
-3. Pour mettre à jour : lancer l'assistant de la nouvelle version (l'application est fermée automatiquement).
+3. Mises à jour : à partir de la version 1.1.0, l'application les propose elle-même (voir *Utilisation*).
+   On peut aussi lancer l'assistant de la nouvelle version (l'application est fermée automatiquement).
 
 Désinstallation : *Paramètres > Applications > Applications installées > BT Battery Tray*.
 
@@ -55,9 +60,11 @@ Clic droit sur une icône :
 
 | Menu | Effet |
 |---|---|
+| **Installer la version X…** | Affiché seulement si une nouvelle version existe : la télécharge, l'installe et relance l'application |
 | Appareils affichés | Cocher/décocher les appareils à afficher |
 | Alerte batterie faible | Notification Windows quand un appareil passe sous le seuil (20 % par défaut), une fois par décharge |
 | Lancer au démarrage de Windows | Active/désactive le lancement automatique |
+| Mises à jour | *Rechercher maintenant*, *Rechercher automatiquement* (une fois par jour, activé par défaut), version installée |
 | Actualiser | Relit immédiatement les niveaux |
 | Quitter | Ferme l'application |
 
@@ -70,6 +77,11 @@ peut y être modifié (`"LowBatteryThreshold": 20`), puis relancer l'application
 | `BtBatteryTray.exe --list` | Affiche les niveaux dans le terminal |
 | `BtBatteryTray.exe --list --verbose` | Idem, avec l'identifiant Windows de chaque appareil |
 | `BtBatteryTray.exe --log` | Lance l'application avec un journal de diagnostic dans `%TEMP%\BtBatteryTray.log` |
+| `BtBatteryTray.exe --check-update [--download]` | Indique si une nouvelle version existe ; `--download` télécharge et vérifie l'assistant sans l'installer |
+
+La mise à jour intégrée télécharge l'assistant dans `%TEMP%\BtBatteryTray-Update`, vérifie son empreinte
+SHA-256 (fournie par GitHub), puis le lance en mode silencieux. Pour une copie installée avec `install.ps1`,
+l'application ouvre seulement la page de la release.
 
 ## Désinstallation
 ```powershell
