@@ -9,7 +9,7 @@
     <Nullable>enable</Nullable>
     <ApplicationIcon>app.ico</ApplicationIcon>
 
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Product>BT Battery Tray</Product>
     <AssemblyTitle>BT Battery Tray</AssemblyTitle>
     <Description>Niveau de batterie des appareils Bluetooth dans la barre des tâches</Description>

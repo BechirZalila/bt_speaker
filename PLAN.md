@@ -110,13 +110,14 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - [x] Diagnostic : `BtBatteryTray.exe --check-update [--download]`
 - [x] Testé : détection (0.9.0 → 1.0.0 proposée, 1.1.0 à jour), téléchargement et vérification SHA-256 de
       l'assistant 1.0.0, compilation de l'assistant 1.1.0
-- [ ] Validation par l'utilisateur de la mise à jour de bout en bout (1.1.0 installée → release 1.2.0)
+- [x] Validation par l'utilisateur de la mise à jour de bout en bout (1.1.0 installée → release 1.2.0) ✅
 
 ### Étape 7 – Fenêtre « À propos » (session 3, version 1.2.0)
 - [x] `AboutForm.cs` : nom, version, description, auteur, copyright (attributs de l'assembly, issus du `.csproj`),
       liens vers la licence MIT, le code source et les issues GitHub ; une seule fenêtre à la fois
 - [x] Entrée « À propos… » dans le menu, option `--about` pour l'afficher seule
 - [x] Release GitHub v1.2.0 (inclut la mise à jour intégrée de la 1.1.0, jamais publiée seule)
+- [x] 1.2.1 : le bouton OK ferme la fenêtre (avec `Show()`, `DialogResult` ne ferme qu'une fenêtre modale)
 
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.

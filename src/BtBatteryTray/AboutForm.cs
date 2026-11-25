@@ -81,7 +81,9 @@ internal sealed class AboutForm : Form
         AddLink("Code source : ", ProjectUrl, ProjectUrl);
         AddLink("Signaler un problème : ", "GitHub Issues", $"{ProjectUrl}/issues");
 
-        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Anchor = AnchorStyles.Right, AutoSize = true };
+        // La fenêtre est ouverte avec Show() (non modale) : DialogResult ne la fermerait pas, d'où Close().
+        var ok = new Button { Text = "OK", Anchor = AnchorStyles.Right, AutoSize = true };
+        ok.Click += (_, _) => Close();
         layout.Controls.Add(ok, 1, row);
         AcceptButton = CancelButton = ok;
 
