@@ -63,7 +63,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "Lancer {#AppName} maintenant"; Flags: nowait postinstall skipifsilent
 ; Mise à jour lancée depuis l'application (/SILENT /UPDATE=1) : on la relance une fois l'exe remplacé.
-Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsAppUpdate
+Filename: "{app}\{#AppExe}"; Parameters: "--updated"; Flags: nowait; Check: IsAppUpdate
 
 [Code]
 const

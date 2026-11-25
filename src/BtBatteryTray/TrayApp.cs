@@ -44,7 +44,7 @@ internal sealed class TrayApp : ApplicationContext
     // Vrai quand la bulle affichée annonce une mise à jour : un clic dessus lance l'installation.
     private bool _balloonIsUpdate;
 
-    public TrayApp()
+    public TrayApp(bool justUpdated = false, bool checkUpdateNow = false)
     {
         _ui = new WindowsFormsSynchronizationContext();
 
@@ -114,6 +114,27 @@ internal sealed class TrayApp : ApplicationContext
             StartUpdateTimer();
 
         Refresh("démarrage");
+
+        if (justUpdated || checkUpdateNow)
+        {
+            // Petit délai : laisse la zone de notification afficher les icônes avant la bulle ou la fenêtre.
+            var startupTimer = new System.Windows.Forms.Timer { Interval = 1500 };
+            startupTimer.Tick += async (_, _) =>
+            {
+                startupTimer.Stop();
+                startupTimer.Dispose();
+                if (justUpdated)
+                {
+                    Log.Write($"Relancé après la mise à jour vers {UpdateChecker.CurrentVersion}");
+                    ShowBalloon(null, "Mise à jour terminée",
+                        $"BT Battery Tray a été mis à jour en version {UpdateChecker.CurrentVersion}.",
+                        ToolTipIcon.Info, isUpdate: false);
+                }
+                if (checkUpdateNow)
+                    await CheckForUpdateAsync(manual: true);
+            };
+            startupTimer.Start();
+        }
     }
 
     private void StartWatcher()
@@ -295,8 +316,8 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>
-    /// Demande confirmation, télécharge l'assistant, le lance en mode silencieux puis quitte :
-    /// l'assistant remplace l'exe et relance l'application.
+    /// Demande confirmation, télécharge l'assistant (fenêtre de progression) et le lance en mode silencieux :
+    /// l'assistant arrête l'application, remplace l'exe et la relance avec --updated.
     /// </summary>
     private async Task InstallUpdateAsync()
     {
@@ -326,26 +347,58 @@ internal sealed class TrayApp : ApplicationContext
 
         _updateBusy = true;
         _installUpdateMenu.Enabled = false;
+        using var cancellation = new CancellationTokenSource();
+        using var progressForm = new UpdateProgressForm(update.Version);
+        progressForm.CancelRequested += (_, _) => cancellation.Cancel();
+        progressForm.Show();
+        progressForm.Activate();
+        var iconsHidden = false;
         try
         {
-            var progress = new Progress<int>(p => _installUpdateMenu.Text = $"Téléchargement de la mise à jour… {p} %");
-            var installer = await UpdateChecker.DownloadAsync(update, progress);
+            var installer = await UpdateChecker.DownloadAsync(update,
+                new Progress<int>(progressForm.SetDownloadProgress), cancellation.Token);
             Log.Write($"Mise à jour {update.Version} téléchargée et vérifiée, lancement de {installer}");
-            UpdateChecker.StartInstaller(installer);
-            ExitThread();
+            progressForm.SetInstalling();
+
+            // L'assistant arrête ce processus (taskkill) juste avant d'installer, puis affiche sa propre fenêtre :
+            // on reste donc ouvert jusque-là pour que la fenêtre de progression ne laisse aucun blanc.
+            // Les icônes sont retirées dès maintenant, sinon taskkill laisserait des icônes fantômes.
+            using var process = UpdateChecker.StartInstaller(installer);
+            HideAllIcons();
+            iconsHidden = true;
+            await process.WaitForExitAsync();
+
+            // Toujours en vie : l'assistant s'est arrêté sans installer.
+            throw new InvalidDataException($"L'assistant d'installation s'est arrêté sans installer (code {process.ExitCode}).");
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+            Log.Write("Mise à jour annulée par l'utilisateur");
         }
         catch (Exception ex) when (IsUpdateError(ex))
         {
             Log.Write($"Échec de la mise à jour : {ex.Message}");
+            progressForm.CloseQuietly();
             MessageBox.Show($"La mise à jour a échoué :\n{ex.Message}", "BT Battery Tray",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
-            _installUpdateMenu.Enabled = true;
-            UpdateInstallMenuItem();
         }
         finally
         {
+            progressForm.CloseQuietly();
+            if (iconsHidden)
+                Refresh("échec de la mise à jour");
+            _installUpdateMenu.Enabled = true;
+            UpdateInstallMenuItem();
             _updateBusy = false;
         }
+    }
+
+    private void HideAllIcons()
+    {
+        foreach (var icon in _icons.Values)
+            icon.Visible = false;
+        if (_placeholder is not null)
+            _placeholder.Visible = false;
     }
 
     private void UpdateMenu()

@@ -81,9 +81,12 @@ peut y être modifié (`"LowBatteryThreshold": 20`), puis relancer l'application
 | `BtBatteryTray.exe --about` | Affiche seulement la fenêtre « À propos » |
 | `BtBatteryTray.exe --check-update [--download]` | Indique si une nouvelle version existe ; `--download` télécharge et vérifie l'assistant sans l'installer |
 
-La mise à jour intégrée télécharge l'assistant dans `%TEMP%\BtBatteryTray-Update`, vérifie son empreinte
-SHA-256 (fournie par GitHub), puis le lance en mode silencieux. Pour une copie installée avec `install.ps1`,
-l'application ouvre seulement la page de la release.
+| `BtBatteryTray.exe --update-now` | Lance l'application et recherche tout de suite une mise à jour |
+
+La mise à jour intégrée télécharge l'assistant dans `%TEMP%\BtBatteryTray-Update` (fenêtre de progression,
+annulable), vérifie son empreinte SHA-256 (fournie par GitHub), puis le lance sans ses pages de questions :
+seule sa barre de progression s'affiche. Une bulle confirme la nouvelle version au redémarrage.
+Pour une copie installée avec `install.ps1`, l'application ouvre seulement la page de la release.
 
 ## Désinstallation
 ```powershell

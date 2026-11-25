@@ -29,7 +29,9 @@ internal static class Program
             return 0;
 
         ApplicationConfiguration.Initialize();
-        using var app = new TrayApp();
+        // --updated : relance par l'assistant après une mise à jour intégrée (confirmation par une bulle).
+        // --update-now : recherche une mise à jour dès le démarrage (comme « Rechercher maintenant »).
+        using var app = new TrayApp(justUpdated: args.Contains("--updated"), checkUpdateNow: args.Contains("--update-now"));
         Application.Run(app);
         return 0;
     }

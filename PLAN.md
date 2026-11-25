@@ -119,6 +119,19 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
 - [x] Release GitHub v1.2.0 (inclut la mise à jour intégrée de la 1.1.0, jamais publiée seule)
 - [x] 1.2.1 : le bouton OK ferme la fenêtre (avec `Show()`, `DialogResult` ne ferme qu'une fenêtre modale)
 
+### Étape 8 – Mise à jour visible de bout en bout (session 3, version 1.2.2)
+Constat de l'utilisateur (1.2.0 → 1.2.1) : plusieurs secondes sans rien voir après « Oui ». La progression
+du téléchargement n'était affichée que dans le menu, fermé à ce moment-là, puis l'application quittait
+avant que la fenêtre de l'assistant apparaisse.
+- [x] `UpdateProgressForm.cs` : fenêtre « Mise à jour de BT Battery Tray » (pourcentage, vérification,
+      lancement), bouton Annuler pendant le téléchargement
+- [x] L'application ne quitte plus d'elle-même : elle masque ses icônes et attend que l'assistant l'arrête
+      (taskkill dans `PrepareToInstall`), juste avant qu'il affiche sa barre de progression. Si l'assistant
+      se termine sans l'arrêter, les icônes reviennent et une erreur s'affiche.
+- [x] Relance par l'assistant avec `--updated` : bulle « Mise à jour terminée » (active dès 1.2.1 → 1.2.2,
+      car c'est l'assistant de la nouvelle version qui passe l'option)
+- [x] Option `--update-now` (recherche immédiate au démarrage, aussi utile pour tester)
+
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
 - **Session 2 (24/11/2026)** : dépôt GitHub public créé, prototype console fonctionnel. Prochaine action : étape 2 (icône dans la barre des tâches).
@@ -133,7 +146,8 @@ Puis fermer/rouvrir le terminal et vérifier : `dotnet --list-sdks`
   avec application lancée, désinstallation complète. Non testé : le téléchargement du runtime (déjà présent ici).
   L'assistant remplace l'exe seul dans la release v1.0.0.
 - **Session 3 (25/11/2026)** : `CLAUDE.md` ajouté. Étape 6 : mise à jour intégrée depuis les releases GitHub (version 1.1.0).
-  Étape 7 : fenêtre « À propos », version 1.2.0 publiée.
+  Étape 7 : fenêtre « À propos », version 1.2.0 publiée, puis 1.2.1 (bouton OK).
+  Étape 8 : fenêtre de progression de la mise à jour, version 1.2.2.
 
 ## Pistes d'évolution (non planifiées)
 - Repère visuel pour distinguer les appareils si plusieurs ont un niveau proche

@@ -128,11 +128,11 @@ internal static class UpdateChecker
     /// Lance l'assistant en mode silencieux (fenêtre de progression seule). Avec /UPDATE=1, il ferme
     /// l'application, laisse le lancement au démarrage tel quel et relance l'application à la fin.
     /// </summary>
-    public static void StartInstaller(string installerPath) =>
+    public static Process StartInstaller(string installerPath) =>
         Process.Start(new ProcessStartInfo(installerPath, "/SILENT /SUPPRESSMSGBOXES /NORESTART /UPDATE=1")
         {
             UseShellExecute = true,
-        });
+        }) ?? throw new InvalidDataException("Impossible de lancer l'assistant d'installation.");
 
     public static void OpenPage(string url) =>
         Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
