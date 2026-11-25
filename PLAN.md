@@ -131,6 +131,9 @@ avant que la fenêtre de l'assistant apparaisse.
 - [x] Relance par l'assistant avec `--updated` : bulle « Mise à jour terminée » (active dès 1.2.1 → 1.2.2,
       car c'est l'assistant de la nouvelle version qui passe l'option)
 - [x] Option `--update-now` (recherche immédiate au démarrage, aussi utile pour tester)
+- [x] Testé en local (code 1.2.2 étiqueté 1.2.0 → release 1.2.1) : fenêtre de progression, passage sans blanc
+      à la fenêtre de l'assistant, relance
+- [x] Validation par l'utilisateur : mise à jour 1.2.1 → 1.2.2 réussie, bulle « Mise à jour terminée » affichée ✅
 
 ## Journal des sessions
 - **Session 1 (24/11/2026)** : faisabilité validée, plan rédigé. Prochaine action : installer le SDK .NET 8.
